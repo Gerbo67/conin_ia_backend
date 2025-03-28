@@ -1,0 +1,11 @@
+﻿# Node Generated Files
+node_modules/
+
+# Files security
+.env
+
+# IDE's
+.idea
+.vscode
+
+.build/
