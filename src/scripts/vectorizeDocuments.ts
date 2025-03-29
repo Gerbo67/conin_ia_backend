@@ -4,7 +4,9 @@ import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import fs from "fs";
 import path from "path";
+import { ChromaClient } from "chromadb";
 
+// Función para vectorizar documentos
 async function vectorizeDocuments(): Promise<void> {
     // Directorio raíz donde se encuentran las carpetas de documentos (e.g., seguridad, tenecia, etc.)
     const docsRoot = path.join(__dirname, "..", "docs");
@@ -57,14 +59,35 @@ async function vectorizeDocuments(): Promise<void> {
     }
 }
 
+// Función para eliminar todas las colecciones usando el cliente de Chroma (backend)
+async function deleteAllCollections(): Promise<void> {
+    const client = new ChromaClient();
+    // listCollections devuelve un array de strings con los nombres de las colecciones
+    const collections: string[] = await client.listCollections();
+    for (const colName of collections) {
+        await client.deleteCollection({ name: colName });
+        console.log(`Colección ${colName} eliminada.`);
+    }
+    console.log("Proceso de eliminación de colecciones completado.");
+}
 
-// Ejecutar el proceso de vectorización
-vectorizeDocuments()
+// Función principal que decide qué acción ejecutar según el argumento
+async function main(): Promise<void> {
+    // Si se pasa "delete" como argumento, elimina las colecciones; de lo contrario, vectoriza
+    const action = process.argv[2];
+    if (action === "delete") {
+        await deleteAllCollections();
+    } else {
+        await vectorizeDocuments();
+    }
+}
+
+main()
     .then(() => {
-        console.log("Proceso de vectorización completado exitosamente.");
+        console.log("Proceso completado exitosamente.");
         process.exit(0);
     })
     .catch((error) => {
-        console.error("Error en el proceso de vectorización:", error);
+        console.error("Error en el proceso:", error);
         process.exit(1);
     });

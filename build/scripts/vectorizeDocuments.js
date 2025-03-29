@@ -18,6 +18,8 @@ const google_genai_1 = require("@langchain/google-genai");
 const pdf_1 = require("@langchain/community/document_loaders/fs/pdf");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
+const chromadb_1 = require("chromadb");
+// Función para vectorizar documentos
 function vectorizeDocuments() {
     return __awaiter(this, void 0, void 0, function* () {
         // Directorio raíz donde se encuentran las carpetas de documentos (e.g., seguridad, tenecia, etc.)
@@ -61,14 +63,39 @@ function vectorizeDocuments() {
         }
     });
 }
-// Ejecutar el proceso de vectorización
-vectorizeDocuments()
+// Función para eliminar todas las colecciones usando el cliente de Chroma (backend)
+function deleteAllCollections() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const client = new chromadb_1.ChromaClient();
+        // listCollections devuelve un array de strings con los nombres de las colecciones
+        const collections = yield client.listCollections();
+        for (const colName of collections) {
+            yield client.deleteCollection({ name: colName });
+            console.log(`Colección ${colName} eliminada.`);
+        }
+        console.log("Proceso de eliminación de colecciones completado.");
+    });
+}
+// Función principal que decide qué acción ejecutar según el argumento
+function main() {
+    return __awaiter(this, void 0, void 0, function* () {
+        // Si se pasa "delete" como argumento, elimina las colecciones; de lo contrario, vectoriza
+        const action = process.argv[2];
+        if (action === "delete") {
+            yield deleteAllCollections();
+        }
+        else {
+            yield vectorizeDocuments();
+        }
+    });
+}
+main()
     .then(() => {
-    console.log("Proceso de vectorización completado exitosamente.");
+    console.log("Proceso completado exitosamente.");
     process.exit(0);
 })
     .catch((error) => {
-    console.error("Error en el proceso de vectorización:", error);
+    console.error("Error en el proceso:", error);
     process.exit(1);
 });
 //# sourceMappingURL=vectorizeDocuments.js.map

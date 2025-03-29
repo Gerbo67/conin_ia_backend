@@ -1,7 +1,10 @@
-﻿import e, {Request, Response} from 'express';
+﻿// AssistantController.ts
+
+import e, {Request, Response} from 'express';
 import ResponseUtil from '../utils/responseUtils';
-import logger from "../utils/logger";
+import logger from '../utils/logger';
 import {contextRepository} from '../repositories/contextRepository';
+import {getOrCreateSessionId} from "../services/sessionMemory";
 
 class AssistantController {
     private response: ResponseUtil;
@@ -11,34 +14,30 @@ class AssistantController {
         this.QuestionAgent = this.QuestionAgent.bind(this);
     }
 
-    /**
-     * Único método para manejar preguntas del usuario
-     * Detecta el tema de la consulta y responde con información relevante
-     */
     public async QuestionAgent(req: Request, res: Response): Promise<e.Response> {
         try {
-            // Obtener el mensaje del usuario
+            // Mensaje del usuario
             const userMessage = req.body.message;
+            // sessionId (si no viene, generamos uno)
+            const sessionId = getOrCreateSessionId(req.body.sessionId);
 
             if (!userMessage) {
                 return this.response.invalidatedResponse({
-                    res: res,
+                    res,
                     detail: 'Se requiere un mensaje para procesar la consulta'
                 });
             }
 
-            logger.info(`AssistantController: Procesando consulta: "${userMessage}"`);
+            logger.info(`AssistantController: Procesando consulta [${sessionId}]: "${userMessage}"`);
 
-            // Define el tema a consultar; en este ejemplo se utiliza "seguridad"
-            const topic = "seguridad";
-
-            // Consultar el repository para obtener el contexto y la respuesta del agente
-            const context = await contextRepository.getContext(userMessage, topic);
+            // Llamamos a getContext con (query, topic, sessionId)
+            const context = await contextRepository.getContext(userMessage, sessionId);
 
             // Retornar la respuesta generada
             return this.response.correctDataResponse({
-                res: res,
+                res,
                 data: {
+                    sessionId,
                     question: context.question,
                     answer: context.answer
                 }
@@ -47,7 +46,7 @@ class AssistantController {
         } catch (error: any) {
             logger.error(`AssistantController: Error en QuestionAgent: ${error.message}`);
             return this.response.errorResponse({
-                res: res,
+                res,
                 detail: `Error procesando la consulta: ${error.message}`
             });
         }

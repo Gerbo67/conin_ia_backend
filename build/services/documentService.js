@@ -23,12 +23,12 @@ class DocumentService {
     /**
      * Realiza una búsqueda semántica en la colección (tema) especificada.
      * @param query Consulta del usuario.
-     * @param tema Nombre de la colección en Chroma DB.
      * @param limit Número máximo de documentos a retornar.
      * @returns Array de documentos que coinciden con la consulta.
      */
-    buscarInformacion(query_1, tema_1) {
-        return __awaiter(this, arguments, void 0, function* (query, tema, limit = 5) {
+    buscarInformacion(query_1) {
+        return __awaiter(this, arguments, void 0, function* (query, limit = 5) {
+            const tema = "gobierno";
             try {
                 // Inicializar ChromaDB para buscar en la colección específica
                 const vectorStore = yield chroma_1.Chroma.fromExistingCollection(this.embeddings, { collectionName: tema });
