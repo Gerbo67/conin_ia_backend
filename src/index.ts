@@ -2,9 +2,6 @@ import express, {Application, Request, Response, NextFunction} from 'express';
 import compression from 'compression';
 import logger from "./utils/logger";
 import socketIO from 'socket.io';
-//import './database/databaseMongo';
-//import './database/databaseMssql';
-import * as path from "path";
 import morgan from 'morgan';
 import http from 'http';
 import cors from 'cors';
@@ -42,7 +39,7 @@ class ServerExpress {
 
     // Configuration server
     config(): void {
-        this.app.set('port', process.env.PORT || 3300);
+        this.app.set('port', process.env.PORT || 3100);
         if (process.env.MORGAN_LOGGING === 'true') {
             this.app.use(morgan('dev'));
         }

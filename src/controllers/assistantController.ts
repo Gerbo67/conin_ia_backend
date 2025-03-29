@@ -1,48 +1,54 @@
 ﻿import e, {Request, Response} from 'express';
 import ResponseUtil from '../utils/responseUtils';
 import logger from "../utils/logger";
-import {Messages} from "../utils/messagesUtils";
-import {aiConfig} from "../config/aiConfig";
+import {contextRepository} from '../repositories/contextRepository';
 
 class AssistantController {
     private response: ResponseUtil;
 
     constructor() {
         this.response = new ResponseUtil();
-        // Vinculamos el método al contexto de la clase para mantener 'this'
         this.QuestionAgent = this.QuestionAgent.bind(this);
     }
 
+    /**
+     * Único método para manejar preguntas del usuario
+     * Detecta el tema de la consulta y responde con información relevante
+     */
     public async QuestionAgent(req: Request, res: Response): Promise<e.Response> {
         try {
-            logger.info('Procesando pregunta del usuario');
-
-            // Verificar si hay un mensaje en la solicitud
+            // Obtener el mensaje del usuario
             const userMessage = req.body.message;
+
             if (!userMessage) {
                 return this.response.invalidatedResponse({
                     res: res,
-                    detail: 'Se requiere un mensaje para procesar la solicitud'
+                    detail: 'Se requiere un mensaje para procesar la consulta'
                 });
             }
 
-            // Procesar el mensaje con la IA
-            const aiResponse = await aiConfig.generateResponse(userMessage);
+            logger.info(`AssistantController: Procesando consulta: "${userMessage}"`);
 
-            // Devolver la respuesta generada
+            // Define el tema a consultar; en este ejemplo se utiliza "seguridad"
+            const topic = "seguridad";
+
+            // Consultar el repository para obtener el contexto y la respuesta del agente
+            const context = await contextRepository.getContext(userMessage, topic);
+
+            // Retornar la respuesta generada
             return this.response.correctDataResponse({
                 res: res,
                 data: {
-                    question: userMessage,
-                    answer: aiResponse
+                    question: context.question,
+                    answer: context.answer
                 }
             });
 
         } catch (error: any) {
-            logger.error(`Error en QuestionAgent: ${error.message}`);
+            logger.error(`AssistantController: Error en QuestionAgent: ${error.message}`);
             return this.response.errorResponse({
                 res: res,
-                detail: `Error al procesar la pregunta: ${error.message}`
+                detail: `Error procesando la consulta: ${error.message}`
             });
         }
     }

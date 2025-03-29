@@ -31,7 +31,7 @@ class ServerExpress {
     }
     // Configuration server
     config() {
-        this.app.set('port', process.env.PORT || 3300);
+        this.app.set('port', process.env.PORT || 3100);
         if (process.env.MORGAN_LOGGING === 'true') {
             this.app.use((0, morgan_1.default)('dev'));
         }

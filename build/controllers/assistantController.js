@@ -15,41 +15,46 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.assistantController = void 0;
 const responseUtils_1 = __importDefault(require("../utils/responseUtils"));
 const logger_1 = __importDefault(require("../utils/logger"));
-const aiConfig_1 = require("../config/aiConfig");
+const contextRepository_1 = require("../repositories/contextRepository");
 class AssistantController {
     constructor() {
         this.response = new responseUtils_1.default();
-        // Vinculamos el método al contexto de la clase para mantener 'this'
         this.QuestionAgent = this.QuestionAgent.bind(this);
     }
+    /**
+     * Único método para manejar preguntas del usuario
+     * Detecta el tema de la consulta y responde con información relevante
+     */
     QuestionAgent(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                logger_1.default.info('Procesando pregunta del usuario');
-                // Verificar si hay un mensaje en la solicitud
+                // Obtener el mensaje del usuario
                 const userMessage = req.body.message;
                 if (!userMessage) {
                     return this.response.invalidatedResponse({
                         res: res,
-                        detail: 'Se requiere un mensaje para procesar la solicitud'
+                        detail: 'Se requiere un mensaje para procesar la consulta'
                     });
                 }
-                // Procesar el mensaje con la IA
-                const aiResponse = yield aiConfig_1.aiConfig.generateResponse(userMessage);
-                // Devolver la respuesta generada
+                logger_1.default.info(`AssistantController: Procesando consulta: "${userMessage}"`);
+                // Define el tema a consultar; en este ejemplo se utiliza "seguridad"
+                const topic = "seguridad";
+                // Consultar el repository para obtener el contexto y la respuesta del agente
+                const context = yield contextRepository_1.contextRepository.getContext(userMessage, topic);
+                // Retornar la respuesta generada
                 return this.response.correctDataResponse({
                     res: res,
                     data: {
-                        question: userMessage,
-                        answer: aiResponse
+                        question: context.question,
+                        answer: context.answer
                     }
                 });
             }
             catch (error) {
-                logger_1.default.error(`Error en QuestionAgent: ${error.message}`);
+                logger_1.default.error(`AssistantController: Error en QuestionAgent: ${error.message}`);
                 return this.response.errorResponse({
                     res: res,
-                    detail: `Error al procesar la pregunta: ${error.message}`
+                    detail: `Error procesando la consulta: ${error.message}`
                 });
             }
         });

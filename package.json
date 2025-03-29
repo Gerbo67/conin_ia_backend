@@ -8,7 +8,8 @@
     "dev": "node --watch build/index.js",
     "server": "concurrently --kill-others \"npm run buildAuto\" \"npm run dev\"",
     "testAuth": "node --watch --exec \"mocha --require ts-node/register\" test/auth.test.ts",
-    "start": "node build/index.js"
+    "start": "node build/index.js",
+    "vectorize": "ts-node src/scripts/vectorizeDocuments.ts"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +17,8 @@
   "description": "",
   "dependencies": {
     "@google/genai": "^0.7.0",
+    "@langchain/community": "^0.3.37",
+    "@langchain/google-genai": "^0.2.0",
     "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
     "chromadb": "^2.1.0",
@@ -33,6 +36,7 @@
     "msnodesqlv8": "^4.2.1",
     "mssql": "^11.0.1",
     "node-vault": "^0.10.2",
+    "pdf-parse": "^1.1.1",
     "pino": "^9.2.0",
     "pino-pretty": "^11.2.1",
     "socket.io": "^4.7.5"
