@@ -1,7 +1,6 @@
-import express, {Application, Request, Response, NextFunction} from 'express';
+import express, {Application} from 'express';
 import compression from 'compression';
 import logger from "./utils/logger";
-import socketIO from 'socket.io';
 import morgan from 'morgan';
 import http from 'http';
 import cors from 'cors';
@@ -20,7 +19,6 @@ class ServerExpress {
 
     // Public
     public app: Application;
-    public io: socketIO.Server;
 
     // Private
     private readonly httpServer: http.Server;
@@ -30,10 +28,8 @@ class ServerExpress {
     constructor() {
         this.app = express();
         this.config();
-        //this.middleware();
         this.routes();
         this.httpServer = new http.Server(this.app);
-        this.io = new socketIO.Server(this.httpServer);
         this.response = new ResponseUtil();
     }
 
@@ -49,26 +45,6 @@ class ServerExpress {
         // this.app.use(express.static(path.join(__dirname, '../docs')));
         this.app.use(express.urlencoded({extended: false}));
     }
-
-    // Middleware to check x-api-key
-    /*middleware(): void {
-        const apiKeyMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-            const apiKey = req.headers['x-api-key'] as string | undefined;
-            const config = await getConfig();
-
-            if (apiKey === config.apiKeyMobil) {
-                res.locals.accessType = 'mobile';
-                next();
-            } else if (apiKey === config.apiKeyWeb) {
-                res.locals.accessType = 'web';
-                next();
-            } else {
-                return this.response.forbiddenResponse({res: res, detail: Messages.Server.NotKey})
-            }
-        };
-
-        this.app.use(apiKeyMiddleware);
-    }*/
 
     // Set routes
     routes(): void {
