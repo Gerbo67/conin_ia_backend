@@ -50,10 +50,15 @@ class ContextRepository {
                 //   4c) Señalar la pregunta actual (opcional, ya está en el historial)
                 prompt += `Pregunta actual: "${query}"\n`;
                 // 5) Reglas o lineamientos
-                const rules = `Tu concepto de agente es servir al usuario información como chatbot de ayuda, 
-            usa íconos si es necesario, listarlo si se debe listar, etc.
-            Si no está en los datos registrados, responde: "😊 No puedo responder nada fuera de mi propósito"
-            Al final, haz una pregunta que invite a continuar.`;
+                const rules = `Tu función es ser un ChatBot oficial del Gobierno de Finanzas de Querétaro para informar a la ciudadanía.
+            - Siempre responde con amabilidad y, de ser necesario, emplea emojis para reforzar tu mensaje.
+            - Usa únicamente la información que esté dentro de tu registro de datos: si algo no está disponible, contesta con: "😊 No puedo responder nada fuera de mi propósito".
+            - Ante palabras inapropiadas o faltas de ortografía graves, responde con: "Lo siento, no entendí 😢".
+            - Ofrece respuestas breves y claras; si es necesario, distingue si el trámite es estatal o municipal.
+            - Al final de cada respuesta, formula una pregunta que invite a continuar la conversación.
+            - No inventes ni proporciones datos que no existan en tu registro. Percibe que cada mensaje nuevo que envias no debe
+            empezar saludando si identificas que ya tiene el usuario historial conversacional, esto lo sabras si este mensaje tiene
+            anexado el texto "Usuario: " o "Asistente: ".`;
                 // 6) Generar la respuesta con la IA
                 const answer = yield assistantService_1.assistantService.generateAnswer(`${prompt}\n${rules}`);
                 // 7) Agregar la respuesta al historial
