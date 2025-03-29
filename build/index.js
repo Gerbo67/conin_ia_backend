@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const compression_1 = __importDefault(require("compression"));
 const logger_1 = __importDefault(require("./utils/logger"));
-const socket_io_1 = __importDefault(require("socket.io"));
 const morgan_1 = __importDefault(require("morgan"));
 const http_1 = __importDefault(require("http"));
 const cors_1 = __importDefault(require("cors"));
@@ -23,10 +22,8 @@ class ServerExpress {
     constructor() {
         this.app = (0, express_1.default)();
         this.config();
-        //this.middleware();
         this.routes();
         this.httpServer = new http_1.default.Server(this.app);
-        this.io = new socket_io_1.default.Server(this.httpServer);
         this.response = new responseUtils_1.default();
     }
     // Configuration server
@@ -41,25 +38,6 @@ class ServerExpress {
         // this.app.use(express.static(path.join(__dirname, '../docs')));
         this.app.use(express_1.default.urlencoded({ extended: false }));
     }
-    // Middleware to check x-api-key
-    /*middleware(): void {
-        const apiKeyMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-            const apiKey = req.headers['x-api-key'] as string | undefined;
-            const config = await getConfig();
-
-            if (apiKey === config.apiKeyMobil) {
-                res.locals.accessType = 'mobile';
-                next();
-            } else if (apiKey === config.apiKeyWeb) {
-                res.locals.accessType = 'web';
-                next();
-            } else {
-                return this.response.forbiddenResponse({res: res, detail: Messages.Server.NotKey})
-            }
-        };
-
-        this.app.use(apiKeyMiddleware);
-    }*/
     // Set routes
     routes() {
         this.app.use('/', indexRoutes_1.default);
