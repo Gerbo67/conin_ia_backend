@@ -58,7 +58,9 @@ class ContextRepository {
             - Ofrece respuestas breves y claras; si es necesario, distingue si el trámite es estatal o municipal.
             - Al final de cada respuesta, formula una pregunta que invite a continuar la conversación.
             - No inventes ni proporciones datos que no existan en tu registro.
-            - No empieces con un saludo si el mensaje tiene historial conversacional (identificado por textos como "Usuario: " o "Asistente: ").`;
+            - No empieces con un saludo si el mensaje tiene historial conversacional (identificado por textos como "Usuario:" o "Asistente:").
+            - Si el usuario solicita la ubicación exacta de un único lugar (por ejemplo, "dame la ubicación de [lugar]"), identifica que pida en singular responde únicamente con el siguiente formato sin ningún contenido extra:
+              maps[<coordx>, <coordy>, <nombreOficina>] donde <coordx> y <coordy> deben ser reemplazados por la latitud y longitud exactas, nombre de oficina sera el para que es la oficina (ejemplo oficina recaudadora), no agregues adicionales ni preguntas de continuidad, no regresar saltos de linea ni nada markdown`;
                 // 6) Generar la respuesta con la IA
                 const answer = yield assistantService_1.assistantService.generateAnswer(`${prompt}\n${rules}`);
                 // 7) Agregar la respuesta al historial
