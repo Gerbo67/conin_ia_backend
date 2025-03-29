@@ -57,6 +57,7 @@ async function vectorizeDocuments(): Promise<void> {
     }
 }
 
+
 // Ejecutar el proceso de vectorización
 vectorizeDocuments()
     .then(() => {
